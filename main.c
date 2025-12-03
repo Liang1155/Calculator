@@ -72,12 +72,20 @@ void cal(Stack* numStack,Stack* opStack){
         }
         StackPush(numStack,&exeNum);
         //将经过三角函数变化后的数字再还回numStack中去
+        #if DEBUG
+        printf("\n这里的三角函数值是%lf",exeNum);
+        #endif
+    //调试模式
     }
     else{
         //如果不是三角函数相关的，而只是普通加减乘除，则回到这里
         double num2;
         StackPeek(numStack,&num2);
         //从数字栈顶取出一个数字，存储在num2
+
+        #if DEBUG
+        printf("\n取出的数字是%lf",num2);
+        #endif
         StackPop(numStack);
         //从数字栈顶弹出这个数字
 
@@ -87,31 +95,55 @@ void cal(Stack* numStack,Stack* opStack){
         StackPop(numStack);
         //从数字栈顶弹出这个数字
 
+        #if DEBUG
+        printf("\n取出的数字是%lf",num1);
+        #endif
+
 
         if(op=='+'){
             double result=(num1+num2);
             StackPush(numStack,&result);
             //符号是加号，两个数字相加，并入栈
+
+            #if DEBUG
+            printf("\n这里加法的值是%lf",result);
+            #endif  
         }
         else if(op=='-'){
             double result=num1-num2;
             StackPush(numStack,&result);
             //符号是减号，两个数字相减，并入栈
+
+            #if DEBUG
+            printf("\n这里减法的值是%lf",result);
+            #endif
         }
         else if(op=='*'){
             double result=(num1)*(num2);
             StackPush(numStack,&result);
             //符号是乘号，两个数字相乘，并入栈
+
+            #if DEBUG
+            printf("\n这里乘法的值是%lf",result);
+            #endif
         }
         else if(op=='/'){
             double result=(num1)/(num2);
             StackPush(numStack,&result);
             //符号是除号，两个数字相除，并入栈
+
+            #if DEBUG
+            printf("\n这里除法的值是%lf",result);
+            #endif
         }
         else if(op=='^'){
             double result=pow(num1,num2);
             StackPush(numStack,&result);
             //符号是乘方，则为两个数的pow
+
+            #if DEBUG
+            printf("\n这里乘方的值是%lf",result);
+            #endif
         }
 
     }
@@ -131,7 +163,7 @@ int main(){
     //声明数字栈numStack
 
     #if DEBUG
-    printf("\n栈创建成功");
+    printf("\n1.栈创建成功");
     #endif
     //调试模式
     StackInit(&opStack,CHAR_SIZE);
@@ -140,7 +172,7 @@ int main(){
     //初始化数字栈，并定义数字栈中每个元素占8个字节(double类型)
 
     #if DEBUG
-    printf("\n栈初始化成功\n");
+    printf("\n2.栈初始化成功\n");
     #endif
 
     char s[MAX_EXPRESSION_LENGTH];
@@ -187,21 +219,18 @@ int main(){
                     //进入下一位
                 }
             }
-            #if DEBUG
-            printf("\n现在到第%d位(防止while死循环)",digitIndex);
-            #endif
-            //调试模式看此处while是否正常运行
-
 
             StackPush(&numStack,&parsedNum);
             //将转化后的数字入栈
             i=digitIndex-1;
             //回到当前是数字而下一位是符号的那个地方
 
+
             #if DEBUG
-            printf("\n此处i的值是%d,digitIndex的值是%d,这两个相差1",i,digitIndex);
+            printf("\n3.现在遇到了小数点,计算完毕,到第%d位,数字是%lf",i,parsedNum);
             #endif
-            //调试模式看此处是否正常
+            //调试模式
+
         }
 
         else if(i>=1&&s[i]=='-'&&s[i-1]=='('){
@@ -227,6 +256,12 @@ int main(){
         else if(s[i]=='('){
             //出现左括号，直接入栈
             StackPush(&opStack,&s[i]);
+            #if DEBUG
+            printf("\n3.现在遇到了左括号,到第%d位",i);
+            #endif
+            //调试模式
+
+
         }
 
 
@@ -260,7 +295,7 @@ int main(){
         //添加结束符
 
         #if DEBUG
-        printf("\n此处的三角函数字符串是%s",trigonometricFunctions);
+        printf("\n5.此处的三角函数字符串是%s",trigonometricFunctions);
         #endif
         //调试模式看此处trigonometricFunction是否正确复制了三角函数
 
@@ -281,7 +316,7 @@ int main(){
         StackPush(&opStack,&op);
         i=alphaIndex-1;
         #if DEBUG
-        printf("\n此处的op是%c,i是%d",op,i);
+        printf("\n6.此处到第%d位,计算三角函数",i);
         #endif
         //调试模式看此处的op是否正确，i是否回到数字位
         }
@@ -317,7 +352,7 @@ int main(){
     //释放num栈内存
     
     #if DEBUG
-    printf("\nStackFree is done!");
+    printf("\n7.StackFree is done!");
     #endif
     //调试模式看此处是否释放了栈内存
 
