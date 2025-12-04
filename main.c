@@ -36,13 +36,13 @@ int OpPriority(char op){
         //乘法的优先级为2
         case '/':return 2;
         //除法的优先级为2
-        case 's':return 3;
+        case 's':return 4;
         //sin的优先级为3
-        case 'c':return 3;
+        case 'c':return 4;
         //cos的优先级为3
-        case 't':return 3;
+        case 't':return 4;
         //tan的优先级为3
-        case '^':return 4;
+        case '^':return 3;
         //乘方的优先级为4
         default :return -1;
         //遇到非法字符变成-1
@@ -156,7 +156,7 @@ void Welcome(){
     printf("请输入表达式:\n");
 }
 
-int main(){
+double Calculate(char s[MAX_EXPRESSION_LENGTH]){
     Stack opStack;    
     //声明运算符栈opStack
     Stack numStack;   
@@ -175,13 +175,7 @@ int main(){
     printf("\n2.栈初始化成功\n");
     #endif
 
-    char s[MAX_EXPRESSION_LENGTH];
     //声明一个字符串，也就是输入的表达式，长度为MAX_EXPRESSION_LENGTH
-    Welcome();
-    //欢迎函数
-    scanf("%s",s);
-    //获取输入的字符串
-
 
     for(int i=0;i<(int)(strlen(s));i++){
         //遍历整个字符串
@@ -323,17 +317,20 @@ int main(){
 
 
         else{
-            //遇到运算符的情况
-            char topElem;
-            //用于获取符号栈栈顶元素
-            StackPeek(&opStack,&topElem);
-            while(!StackIsEmpty(&opStack)&&(topElem)!='('&&OpPriority(topElem)>OpPriority(s[i])){
-                //如果当前的符号优先级低于符号栈栈顶的优先级，那么需要先计算栈顶的符号
+            while(!StackIsEmpty(&opStack)){
+                char topElem;
+                //栈顶元素topElem
                 StackPeek(&opStack,&topElem);
-                cal(&numStack,&opStack);//计算
+                //获取opStack的栈顶元素
+                if(topElem=='('||OpPriority(topElem)<=OpPriority(s[i])){
+                    break;
+                    /*如果遇到左括号就停止while循环
+                     *如果栈顶元素的优先级低于当前元素的优先级也停止循环
+                     */
+                }
+                cal(&numStack,&opStack);
             }
             StackPush(&opStack,&s[i]);
-            //然后当前符号入栈
         }
     }
     while(!StackIsEmpty(&opStack)){
@@ -344,8 +341,6 @@ int main(){
     //这个是最终的结果
     StackPeek(&numStack,&result);
     //最终数字栈内只有一个数字，这个数字就是最终结果
-    printf("\nThe result is %lf,thanks!",result);
-    //输出最终结果
     StackFree(&opStack);
     //释放op栈内存
     StackFree(&numStack);
@@ -356,5 +351,60 @@ int main(){
     #endif
     //调试模式看此处是否释放了栈内存
 
+    return result;
+}
+
+int main(){
+    Welcome();
+    //欢迎函数
+
+    char inputFile[500];
+    //inputFile是表达式文件
+    char outputFile[500];
+    //outputFile是输出结果的文件
+
+
+    printf("输入表达式文件");
+    scanf("%s",inputFile);
+    //获得表达式文件
+    printf("输入输出文件");
+    scanf("%s",outputFile);
+    //获得输出结果的文件
+    FILE* fin=fopen(inputFile,"r");
+    //fin就是输入表达式的文件，用read模式打开
+    FILE* fout=fopen(outputFile,"w");
+    //fout就是输出结果的文件，用write模式打开
+
+    if(fin==NULL){
+    perror("文件打开失败");
+    return 1;
+    }
+
+
+    char expression[MAX_EXPRESSION_LENGTH];
+    //expression为单个的表达式
+    while (fgets(expression,MAX_EXPRESSION_LENGTH,fin)!=NULL) {
+    // 处理换行符：去除字符串末尾的'\n'或'\r'
+    expression[strcspn(expression, "\n\r")] = '\0';
+    // 跳过空行
+
+    if(strlen(expression)==0){
+        continue;
+    }
+        
+    
+    double result=Calculate(expression);
+    // 计算表达式结果
+
+    fprintf(fout, "%s =%lf\n",expression,result);
+    //写入结果到输出文件(格式:表达式=结果)
+    printf("已处理 %s=%lf\n",expression,result);
+    //显示目前计算的表达式是哪一个，结果是多少
+    }
+
+    fclose(fin);
+    fclose(fout);
+    //释放资源
+    printf("批量计算完成，结果已写入到%s\n", outputFile);
     return 0;
 }
