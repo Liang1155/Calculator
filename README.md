@@ -8,5 +8,9 @@
 D://desk//Calculator_All_version//Calculator_Version11//expr.txt  
 D://desk//Calculator_All_version//Calculator_Version11//resul.txt  
 **请注意需要使用//，并且头尾不要添加""**  
+## 2025.12.10更新
+应老师要求更改成**链表实现栈**的功能，故添加LinkedList,LinkedStack等文件
+由于原本的main.c太长，已经拆分出body.c
+body.c主要负责进行单个表达式运算，main.c实现读取输入输出文件，并传入body.c中计算，从而实现批量计算
 Linux版本随意
 
